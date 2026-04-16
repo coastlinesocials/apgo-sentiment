@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Apollo Silver Corp. — Sentiment Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300;1,9..40,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0f2744;
+    --navy-mid: #1a3a5c;
+    --navy-light: #1e4470;
+    --gold: #c9a84c;
+    --gold-light: #e8c97a;
+    --gold-pale: #f5e9c8;
+    --cream: #faf8f4;
+    --white: #ffffff;
+    --text-primary: #0f2744;
+    --text-muted: #4a6080;
+    --text-light: #7a90a8;
+    --positive: #2e7d52;
+    --positive-bg: #e8f5ee;
+    --neutral: #5a6a7a;
+    --neutral-bg: #eef1f4;
+    --negative: #b33a3a;
+    --negative-bg: #faeaea;
+    --border: rgba(15,39,68,0.1);
+    --shadow: 0 2px 16px rgba(15,39,68,0.08);
+    --shadow-lg: 0 8px 40px rgba(15,39,68,0.12);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--text-primary);
+    min-height: 100vh;
+  }
+
+  /* NAV */
+  nav {
+    background: var(--navy);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 2px solid var(--gold);
+  }
+
+  .nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .nav-logo {
+    width: 32px;
+    height: 32px;
+    background: var(--gold);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'DM Serif Display', serif;
+    color: var(--navy);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+
+  .nav-title {
+    font-family: 'DM Serif Display', serif;
+    color: var(--white);
+    font-size: 15px;
+    letter-spacing: 0.01em;
+  }
+
+  .nav-subtitle {
+    color: var(--gold);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .nav-right {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .nav-tag {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.45);
+  }
+
+  .nav-date {
+    font-size: 12px;
+    color: rgba(255,255,255,0.55);
+    font-weight: 400;
+  }
+
+  /* HERO */
+  .hero {
+    background: var(--navy);
+    padding: 3rem 2rem 2.5rem;
+    border-bottom: 1px solid rgba(201,168,76,0.25);
+  }
+
+  .hero-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .hero-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 0.6rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .hero-label::before {
+    content: '';
+    display: inline-block;
+    width: 18px;
+    height: 2px;
+    background: var(--gold);
+  }
+
+  .hero-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    color: var(--white);
+    line-height: 1.1;
+    margin-bottom: 0.75rem;
+  }
+
+  .hero-desc {
+    color: rgba(255,255,255,0.55);
+    font-size: 14px;
+    font-weight: 400;
+    max-width: 540px;
+    line-height: 1.6;
+  }
+
+  /* MAIN */
+  .main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2.5rem 2rem 4rem;
+  }
+
+  /* SECTION HEADER */
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.2rem;
+    color: var(--navy);
+  }
+
+  .section-meta {
+    font-size: 12px;
+    color: var(--text-light);
+    font-weight: 400;
+  }
+
+  /* KPI STRIP */
+  .kpi-strip {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 2.5rem;
+    box-shadow: var(--shadow);
+  }
+
+  .kpi-cell {
+    background: var(--white);
+    padding: 1.5rem 1.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .kpi-label {
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--text-light);
+  }
+
+  .kpi-value {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2rem;
+    color: var(--navy);
+    line-height: 1;
+  }
+
+  .kpi-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    width: fit-content;
+    margin-top: 2px;
+  }
+
+  .chip-positive { background: var(--positive-bg); color: var(--positive); }
+  .chip-neutral  { background: var(--neutral-bg);  color: var(--neutral);  }
+  .chip-negative { background: var(--negative-bg); color: var(--negative); }
+  .chip-gold     { background: var(--gold-pale);   color: #7a5e1a;         }
+
+  /* SENTIMENT BAR */
+  .sentiment-section {
+    margin-bottom: 2.5rem;
+  }
+
+  .sentiment-bar-wrap {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 2rem;
+    box-shadow: var(--shadow);
+  }
+
+  .sentiment-bar-track {
+    display: flex;
+    height: 18px;
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 1.25rem;
+    gap: 3px;
+  }
+
+  .bar-pos {
+    background: linear-gradient(90deg, #2e7d52, #4caf7d);
+    border-radius: 6px 0 0 6px;
+    transition: width 1.2s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  .bar-neu {
+    background: linear-gradient(90deg, #8a9db5, #aabcce);
+    transition: width 1.2s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  .bar-neg {
+    background: linear-gradient(90deg, #c94f4f, #b33a3a);
+    border-radius: 0 6px 6px 0;
+    transition: width 1.2s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  .sentiment-legend {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  .legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .dot-pos { background: #2e7d52; }
+  .dot-neu { background: #8a9db5; }
+  .dot-neg { background: #b33a3a; }
+
+  .legend-pct {
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  /* TWO-COL GRID */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+    margin-bottom: 2.5rem;
+  }
+
+  /* CARD */
+  .card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.75rem;
+    box-shadow: var(--shadow);
+  }
+
+  .card-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1rem;
+    color: var(--navy);
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .platform-badge {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: var(--navy);
+    color: var(--gold);
+  }
+
+  /* SOURCE CARDS */
+  .source-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+
+  .source-item {
+    padding: 1rem 1.1rem;
+    border-radius: 7px;
+    border-left: 3px solid transparent;
+    background: var(--cream);
+    font-size: 13px;
+  }
+
+  .source-item.pos { border-left-color: var(--positive); background: var(--positive-bg); }
+  .source-item.neu { border-left-color: #8a9db5; background: var(--neutral-bg); }
+  .source-item.neg { border-left-color: var(--negative); background: var(--negative-bg); }
+
+  .source-quote {
+    font-style: italic;
+    color: var(--text-muted);
+    margin-bottom: 0.4rem;
+    line-height: 1.5;
+  }
+
+  .source-interp {
+    font-size: 11.5px;
+    color: var(--text-light);
+    font-weight: 500;
+  }
+
+  /* THEME PILLS */
+  .theme-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+
+  .theme-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.85rem;
+  }
+
+  .theme-num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.4rem;
+    color: var(--gold);
+    line-height: 1;
+    flex-shrink: 0;
+    width: 28px;
+  }
+
+  .theme-content {}
+
+  .theme-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--navy);
+    margin-bottom: 2px;
+  }
+
+  .theme-desc {
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  .theme-sources {
+    display: flex;
+    gap: 5px;
+    margin-top: 5px;
+    flex-wrap: wrap;
+  }
+
+  .source-tag {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    padding: 2px 6px;
+    border-radius: 3px;
+    background: rgba(15,39,68,0.07);
+    color: var(--text-muted);
+    text-transform: uppercase;
+  }
+
+  /* LAYERS */
+  .layers-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .layer-item {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.9rem 1.1rem;
+    border-radius: 7px;
+    background: var(--cream);
+    border: 1px solid var(--border);
+  }
+
+  .layer-num {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--text-light);
+    text-transform: uppercase;
+  }
+
+  .layer-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--navy);
+    margin-bottom: 2px;
+  }
+
+  .layer-eg {
+    font-size: 11.5px;
+    font-style: italic;
+    color: var(--text-light);
+  }
+
+  /* RISK BOX */
+  .risk-box {
+    background: #fdf4f4;
+    border: 1px solid rgba(179,58,58,0.2);
+    border-left: 4px solid var(--negative);
+    border-radius: 10px;
+    padding: 1.75rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .risk-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 1rem;
+  }
+
+  .risk-icon {
+    width: 32px;
+    height: 32px;
+    background: var(--negative);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 15px;
+    flex-shrink: 0;
+  }
+
+  .risk-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.1rem;
+    color: var(--negative);
+  }
+
+  .risk-body {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.65;
+  }
+
+  .risk-quote {
+    margin-top: 1rem;
+    padding: 0.85rem 1rem;
+    background: rgba(179,58,58,0.07);
+    border-radius: 6px;
+    font-style: italic;
+    font-size: 13px;
+    color: var(--negative);
+    line-height: 1.55;
+  }
+
+  /* NARRATIVE SHIFT */
+  .narrative-box {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 2rem;
+    box-shadow: var(--shadow);
+    margin-bottom: 2.5rem;
+    text-align: center;
+  }
+
+  .narrative-flow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    margin-top: 1.25rem;
+  }
+
+  .narrative-node {
+    background: var(--navy-light);
+    color: white;
+    padding: 0.75rem 1.25rem;
+    border-radius: 8px;
+    font-size: 13.5px;
+    font-weight: 500;
+    max-width: 220px;
+    line-height: 1.4;
+    text-align: center;
+  }
+
+  .narrative-arrow {
+    font-size: 1.4rem;
+    color: var(--gold);
+    font-weight: 700;
+  }
+
+  .narrative-node.new {
+    background: var(--gold);
+    color: var(--navy);
+    font-weight: 600;
+  }
+
+  /* FOOTER */
+  footer {
+    background: var(--navy);
+    padding: 1.5rem 2rem;
+    text-align: center;
+    font-size: 11.5px;
+    color: rgba(255,255,255,0.4);
+    border-top: 2px solid var(--gold);
+    letter-spacing: 0.04em;
+  }
+
+  footer span { color: rgba(255,255,255,0.6); }
+
+  /* FULL-WIDTH CARD */
+  .full-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.75rem;
+    box-shadow: var(--shadow);
+    margin-bottom: 2.5rem;
+  }
+
+  /* OPPORTUNITY BOX */
+  .opportunity-box {
+    background: var(--navy);
+    border-radius: 10px;
+    padding: 2rem;
+    margin-bottom: 2.5rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+
+  .opp-col-title {
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    margin-bottom: 0.85rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255,255,255,0.12);
+  }
+
+  .opp-col-title.focused { color: rgba(255,255,255,0.45); }
+  .opp-col-title.gap { color: var(--gold); }
+
+  .opp-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .opp-list li {
+    font-size: 13px;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    line-height: 1.5;
+  }
+
+  .opp-list.focused li { color: rgba(255,255,255,0.55); }
+  .opp-list.gap li { color: rgba(255,255,255,0.85); }
+
+  .opp-bullet {
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    font-weight: 700;
+    margin-top: 1px;
+  }
+
+  .opp-list.focused .opp-bullet { background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.4); }
+  .opp-list.gap .opp-bullet { background: var(--gold); color: var(--navy); }
+
+  @media (max-width: 700px) {
+    .two-col { grid-template-columns: 1fr; }
+    .kpi-strip { grid-template-columns: 1fr; }
+    .opportunity-box { grid-template-columns: 1fr; }
+    .narrative-flow { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-brand">
+    <div class="nav-logo">A</div>
+    <div>
+      <div class="nav-title">Apollo Silver Corp.</div>
+      <div class="nav-subtitle">Sentiment Dashboard</div>
+    </div>
+  </div>
+  <div class="nav-right">
+    <div class="nav-tag">APGO · TSX-V</div>
+    <div class="nav-date">April 2026</div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-label">Market Sentiment Intelligence</div>
+    <h1 class="hero-title">April 2026 Sentiment Report</h1>
+    <p class="hero-desc">Cross-platform sentiment analysis covering CEO.ca, Twitter/X, and Reddit. Prepared by Coastline Communications.</p>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- KPI STRIP -->
+  <div class="section-header">
+    <div class="section-title">At a Glance</div>
+    <div class="section-meta">April 2026 · All platforms</div>
+  </div>
+
+  <div class="kpi-strip" style="margin-bottom:2.5rem;">
+    <div class="kpi-cell">
+      <div class="kpi-label">Overall Sentiment</div>
+      <div class="kpi-value">Net Pos.</div>
+      <div class="kpi-chip chip-positive">↑ Constructive</div>
+    </div>
+    <div class="kpi-cell">
+      <div class="kpi-label">Primary Driver</div>
+      <div class="kpi-value" style="font-size:1.5rem; padding-top:4px;">Silver Macro</div>
+      <div class="kpi-chip chip-gold">All Sources</div>
+    </div>
+    <div class="kpi-cell">
+      <div class="kpi-label">Emerging Risk</div>
+      <div class="kpi-value" style="font-size:1.25rem; padding-top:6px;">Cinco Timelines</div>
+      <div class="kpi-chip chip-negative">↑ Increasing</div>
+    </div>
+  </div>
+
+  <!-- SENTIMENT DISTRIBUTION -->
+  <div class="sentiment-section">
+    <div class="section-header">
+      <div class="section-title">Sentiment Distribution</div>
+      <div class="section-meta">Adjusted · April 2026</div>
+    </div>
+
+    <div class="sentiment-bar-wrap">
+      <div class="sentiment-bar-track">
+        <div class="bar-pos" style="width:57.5%"></div>
+        <div class="bar-neu" style="width:27.5%"></div>
+        <div class="bar-neg" style="width:12.5%"></div>
+      </div>
+      <div class="sentiment-legend">
+        <div class="legend-item">
+          <div class="legend-dot dot-pos"></div>
+          <span class="legend-pct">~55–60%</span>
+          <span>Positive</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot dot-neu"></div>
+          <span class="legend-pct">~25–30%</span>
+          <span>Neutral / Noise</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot dot-neg"></div>
+          <span class="legend-pct">~10–15%</span>
+          <span>Negative <em style="font-size:11px; color:var(--negative)">(increasing in importance)</em></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PLATFORM SOURCE INSIGHTS -->
+  <div class="section-header">
+    <div class="section-title">Source-Level Insights</div>
+    <div class="section-meta">By platform and time period</div>
+  </div>
+
+  <div class="two-col" style="margin-bottom:2.5rem;">
+
+    <!-- CEO.ca -->
+    <div class="card">
+      <div class="card-title">
+        CEO.ca
+        <span class="platform-badge">Retail Core</span>
+      </div>
+      <div style="font-size:11px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:var(--text-light); margin-bottom:0.6rem;">Early April (Apr 1–6) · Neutral to Slightly Positive</div>
+      <div class="source-list" style="margin-bottom:1.25rem;">
+        <div class="source-item pos">
+          <div class="source-quote">"Andy stating he's got $17.5 million in APGO and it's his #1 priority"</div>
+          <div class="source-interp">Strong insider alignment signal; reinforces bullish conviction</div>
+        </div>
+        <div class="source-item neu">
+          <div class="source-quote">"APGO is poetry in motion"</div>
+          <div class="source-interp">Macro belief present; skepticism mostly meme-based and low conviction</div>
+        </div>
+      </div>
+      <div style="font-size:11px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:var(--negative); margin-bottom:0.6rem;">Mid-April (Apr 8–14) · Neutral → Emerging Negative</div>
+      <div class="source-list">
+        <div class="source-item neu">
+          <div class="source-quote">"Must be vote coming soon. Last chance to get in cheap"</div>
+          <div class="source-interp">Timeline expectation building; hopeful but unconfirmed</div>
+        </div>
+        <div class="source-item neg">
+          <div class="source-quote">"You generally don't go from imminent vote to months of delays"</div>
+          <div class="source-interp">Most important turning point; logical, specific, and repeatable criticism</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Twitter + Reddit -->
+    <div style="display:flex; flex-direction:column; gap:1.25rem;">
+      <div class="card">
+        <div class="card-title">
+          Twitter / X
+          <span class="platform-badge">Influencers + Traders</span>
+        </div>
+        <div class="source-list">
+          <div class="source-item pos">
+            <div class="source-quote">"The setup on the weekly chart is DREAMY"</div>
+            <div class="source-interp">High-conviction upside narrative; combines technical and macro thesis</div>
+          </div>
+          <div class="source-item pos">
+            <div class="source-quote">"We bought $APGO… because of bull flag breakouts. All of them delivered so far."</div>
+            <div class="source-interp">APGO entering momentum rotation; short-term validation from traders</div>
+          </div>
+          <div class="source-item pos">
+            <div class="source-quote">"Should be a 10x coming 24 months here if silver goes where I believe it will go"</div>
+            <div class="source-interp">Strong amplification potential; macro-anchored upside framing</div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">
+          Reddit
+          <span class="platform-badge">Narrative Positioning</span>
+        </div>
+        <div class="source-list">
+          <div class="source-item pos">
+            <div class="source-quote">"Capital starts to move toward projects that are real and actually buildable"</div>
+            <div class="source-interp">Strategic framing; buildability and jurisdiction thesis (U.S.) gaining traction</div>
+          </div>
+          <div class="source-item pos">
+            <div class="source-quote">"Which projects actually matter, and which ones can move forward?"</div>
+            <div class="source-interp">Intentional positioning; PEA pathway and dual-asset structure highlighted</div>
+          </div>
+        </div>
+        <div style="margin-top:0.85rem; padding:0.65rem 0.85rem; background:var(--gold-pale); border-radius:6px; font-size:11.5px; color:#7a5e1a; line-height:1.5;">
+          Note: Reddit content is intentional positioning; not yet broadly echoed across other platforms.
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- CORE THEMES -->
+  <div class="section-header">
+    <div class="section-title">Core Themes</div>
+    <div class="section-meta">With source anchors</div>
+  </div>
+
+  <div class="full-card">
+    <div class="theme-grid">
+      <div class="theme-row">
+        <div class="theme-num">1</div>
+        <div class="theme-content">
+          <div class="theme-name">Silver Macro Strength</div>
+          <div class="theme-desc">Strongest and most consistent driver across all channels. Baseline bullish sentiment anchored to silver pricing upside and shortage thesis.</div>
+          <div class="theme-sources">
+            <span class="source-tag">CEO.ca</span>
+            <span class="source-tag">Twitter</span>
+            <span class="source-tag">Reddit</span>
+          </div>
+        </div>
+        <div class="kpi-chip chip-positive" style="white-space:nowrap; align-self:center;">Dominant</div>
+      </div>
+      <div style="height:1px; background:var(--border);"></div>
+      <div class="theme-row">
+        <div class="theme-num">2</div>
+        <div class="theme-content">
+          <div class="theme-name">Technical Momentum</div>
+          <div class="theme-desc">Early-stage momentum recognition attracting trader attention; supporting price action in the short term. Bull flag breakouts noted.</div>
+          <div class="theme-sources">
+            <span class="source-tag">Twitter</span>
+            <span class="source-tag">CEO.ca (early)</span>
+          </div>
+        </div>
+        <div class="kpi-chip chip-positive" style="white-space:nowrap; align-self:center;">Building</div>
+      </div>
+      <div style="height:1px; background:var(--border);"></div>
+      <div class="theme-row">
+        <div class="theme-num">3</div>
+        <div class="theme-content">
+          <div class="theme-name">Credibility / Alignment Signals</div>
+          <div class="theme-desc">High-impact trust signal from insider position disclosure. Strongly reinforces bullish sentiment when mentioned.</div>
+          <div class="theme-sources">
+            <span class="source-tag">CEO.ca</span>
+          </div>
+        </div>
+        <div class="kpi-chip chip-gold" style="white-space:nowrap; align-self:center;">High Impact</div>
+      </div>
+      <div style="height:1px; background:var(--border);"></div>
+      <div class="theme-row">
+        <div class="theme-num">4</div>
+        <div class="theme-content">
+          <div class="theme-name">Soft Skepticism</div>
+          <div class="theme-desc">Mild frustration; reputation drag present but not aggressive or thesis-driven. Important to track for persistence.</div>
+          <div class="theme-sources">
+            <span class="source-tag">CEO.ca (early)</span>
+          </div>
+        </div>
+        <div class="kpi-chip chip-neutral" style="white-space:nowrap; align-self:center;">Monitor</div>
+      </div>
+      <div style="height:1px; background:var(--border);"></div>
+      <div class="theme-row">
+        <div class="theme-num">5</div>
+        <div class="theme-content">
+          <div class="theme-name">Cinco Timeline + Communication Concern</div>
+          <div class="theme-desc">First credible negative narrative; logical, specific, and repeatable. Focused on delays, stakeholder complexity, and lack of updates from company.</div>
+          <div class="theme-sources">
+            <span class="source-tag">CEO.ca (mid-April)</span>
+          </div>
+        </div>
+        <div class="kpi-chip chip-negative" style="white-space:nowrap; align-self:center;">⚠ Watch</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SENTIMENT LAYERING -->
+  <div class="section-header">
+    <div class="section-title">Sentiment Layering</div>
+    <div class="section-meta">Three simultaneous narratives · Key insight</div>
+  </div>
+
+  <div class="full-card" style="margin-bottom:2.5rem;">
+    <div class="layers-wrap">
+      <div class="layer-item">
+        <div class="layer-num">Layer 1</div>
+        <div>
+          <div class="layer-name">Macro Bull Case</div>
+          <div class="layer-eg">"Silver going to $75–$100+" · "10x potential"</div>
+        </div>
+        <div class="kpi-chip chip-positive">All Sources</div>
+      </div>
+      <div class="layer-item">
+        <div class="layer-num">Layer 2</div>
+        <div>
+          <div class="layer-name">Technical Momentum</div>
+          <div class="layer-eg">"Bull flag breakouts" · "Quality juniors catching a bid"</div>
+        </div>
+        <div class="kpi-chip chip-positive">Twitter + CEO.ca</div>
+      </div>
+      <div class="layer-item" style="border:1px solid rgba(179,58,58,0.2); background:#fdf4f4;">
+        <div class="layer-num" style="color:var(--negative);">Layer 3</div>
+        <div>
+          <div class="layer-name" style="color:var(--negative);">Execution Concern</div>
+          <div class="layer-eg">"What is going on at Cinco?" · "Missed timeline" · "Lack of communication"</div>
+        </div>
+        <div class="kpi-chip chip-negative">CEO.ca</div>
+      </div>
+    </div>
+    <div style="margin-top:1.1rem; padding:0.85rem 1rem; background:rgba(15,39,68,0.04); border-radius:6px; font-size:12.5px; color:var(--text-muted); line-height:1.55;">
+      These layers are not aligned yet. Macro and technical remain positive; fundamentals are starting to be questioned. Convergence of Layer 3 with the others is the key risk to monitor going into May.
+    </div>
+  </div>
+
+  <!-- PRIMARY RISK -->
+  <div class="section-header">
+    <div class="section-title">Primary Risk</div>
+    <div class="section-meta">Emerging · Mid-April 2026</div>
+  </div>
+
+  <div class="risk-box">
+    <div class="risk-header">
+      <div class="risk-icon">!</div>
+      <div class="risk-title">Cinco de Mayo Delays + Communication Gap</div>
+    </div>
+    <div class="risk-body">
+      The first credible fundamental concern identified this month. The narrative is logical, relatable, and easy to spread; it does not require insider knowledge and can be repeated by any retail participant who has followed the Cinco timeline.
+      <br><br>
+      The risk is not the delay itself but the absence of proactive communication from the company. Silence on a missed timeline converts a manageable operational update into a trust issue. The longer this gap persists, the more durable the concern becomes.
+    </div>
+    <div class="risk-quote">
+      "You generally don't go from imminent vote to months of delays" — CEO.ca, mid-April 2026
+    </div>
+  </div>
+
+  <!-- NARRATIVE GAP / OPPORTUNITY -->
+  <div class="section-header">
+    <div class="section-title">Narrative Gap</div>
+    <div class="section-meta">Where current market focus falls short</div>
+  </div>
+
+  <div class="opportunity-box">
+    <div>
+      <div class="opp-col-title focused">Current Market Focus</div>
+      <ul class="opp-list focused">
+        <li><span class="opp-bullet">→</span> Silver macro and pricing upside</li>
+        <li><span class="opp-bullet">→</span> Technical chart setups</li>
+        <li><span class="opp-bullet">→</span> Short-term momentum rotation</li>
+      </ul>
+    </div>
+    <div>
+      <div class="opp-col-title gap">Underdeveloped Narrative (Opportunity)</div>
+      <ul class="opp-list gap">
+        <li><span class="opp-bullet">✓</span> Project-level understanding (Calico + Cinco)</li>
+        <li><span class="opp-bullet">✓</span> Development pathway and PEA advancement</li>
+        <li><span class="opp-bullet">✓</span> U.S. jurisdiction as a strategic differentiator</li>
+        <li><span class="opp-bullet">✓</span> Dual-asset structure and buildability thesis</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- NARRATIVE SHIFT -->
+  <div class="section-header">
+    <div class="section-title">Narrative Shift</div>
+    <div class="section-meta">Direction of travel heading into May</div>
+  </div>
+
+  <div class="narrative-box">
+    <div style="font-size:11px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:var(--text-light); margin-bottom:0.5rem;">The conversation is moving from</div>
+    <div class="narrative-flow">
+      <div class="narrative-node">"Silver is going up"</div>
+      <div class="narrative-arrow">→</div>
+      <div class="narrative-node new">"Silver is going up… but can APGO execute and deliver?"</div>
+    </div>
+  </div>
+
+  <!-- SENTIMENT QUALITY -->
+  <div class="section-header">
+    <div class="section-title">Sentiment Quality Assessment</div>
+    <div class="section-meta">Signal vs. noise</div>
+  </div>
+
+  <div class="two-col" style="margin-bottom:0;">
+    <div class="card">
+      <div class="card-title" style="color:var(--positive);">High-Value Signals</div>
+      <div class="source-list">
+        <div class="source-item pos">
+          <div class="source-interp">Influencer tweet with 10x thesis and macro anchor</div>
+        </div>
+        <div class="source-item pos">
+          <div class="source-interp">CEO.ca long-form macro posts with detailed silver arguments</div>
+        </div>
+        <div class="source-item neg">
+          <div class="source-interp">Cinco concern post; structured criticism with timeline specifics</div>
+        </div>
+        <div class="source-item pos">
+          <div class="source-interp">Reddit strategic positioning on buildability and jurisdiction</div>
+        </div>
+      </div>
+      <div style="margin-top:1rem; font-size:12px; color:var(--text-light); font-style:italic;">Note: negative sentiment is low volume but high quality this month.</div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:var(--text-light);">Low-Value / Noise</div>
+      <div class="source-list">
+        <div class="source-item neu">
+          <div class="source-interp">Memes and jokes with no thesis content</div>
+        </div>
+        <div class="source-item neu">
+          <div class="source-interp">AI debates unrelated to company fundamentals</div>
+        </div>
+        <div class="source-item neu">
+          <div class="source-interp">One-line reactions without context or conviction</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+  Coastline Communications &nbsp;·&nbsp; <span>Apollo Silver Corp.</span> &nbsp;·&nbsp; Sentiment Dashboard — April 2026 &nbsp;·&nbsp; Confidential
+</footer>
+
+</body>
+</html>
